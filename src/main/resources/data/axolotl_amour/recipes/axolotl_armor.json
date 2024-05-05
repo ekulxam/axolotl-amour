@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "n": {
+      "item": "minecraft:turtle_scute"
+    },
+    "t": {
+      "item": "minecraft:nautilus_shell"
+    }
+  },
+  "pattern": [
+    "  n",
+    "ntn",
+    "n n"
+  ],
+  "result": {
+    "count": 1,
+    "id": "axolotl_amour:axolotl_armor"
+  }
+}

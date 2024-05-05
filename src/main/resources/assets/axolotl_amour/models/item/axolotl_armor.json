@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "axolotl_armor:item/axolotl_armor",
+    "layer1": "axolotl_armor:item/axolotl_armor_overlay"
+  }
+}

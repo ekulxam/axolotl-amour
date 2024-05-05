@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "survivalblock.axolotlamour.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AnimalEntityMixin",
+    "AxolotlEntityMixin"
+  ],
+  "client": [
+    "client.AxolotlEntityRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}
