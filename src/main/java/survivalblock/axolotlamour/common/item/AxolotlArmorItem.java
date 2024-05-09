@@ -53,18 +53,5 @@ public class AxolotlArmorItem
     public boolean isEnchantable(ItemStack stack) {
         return false;
     }
-
-    @Override
-    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        World world = user.getWorld();
-        if (entity instanceof AxolotlEntity axolotl) {
-            if (!world.isClient() && stack.isOf(AxolotlAmourItems.AXOLOTL_ARMOR) && !((AxolotlArmorAccess) axolotl).axolotl_amour$hasArmor() && !axolotl.isBaby()) {
-                axolotl.equipBodyArmor(stack.copyWithCount(1));
-                stack.decrementUnlessCreative(1, user);
-            }
-            return ActionResult.success(world.isClient());
-        }
-        return super.useOnEntity(stack, user, entity, hand);
-    }
 }
 

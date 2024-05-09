@@ -1,6 +1,10 @@
 package survivalblock.axolotlamour.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementEntry;
+import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -15,10 +19,14 @@ import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerAdvancementLoader;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -82,18 +90,43 @@ public abstract class AnimalEntityMixin extends PassiveEntity {
                 ItemStack itemStack2 = this.getBodyArmor();
                 this.equipBodyArmor(ItemStack.EMPTY);
                 this.dropStack(itemStack2);
+                grantAdvancment(player, false);
             }
             cir.setReturnValue(ActionResult.success(world.isClient()));
         }
-        if (ArmorMaterials.ARMADILLO.value().repairIngredient().get().test(stack) && ((AxolotlArmorAccess) axolotl).axolotl_amour$hasArmor() && this.getBodyArmor().isDamaged()) {
+        if (ArmorMaterials.TURTLE.value().repairIngredient().get().test(stack) && ((AxolotlArmorAccess) axolotl).axolotl_amour$hasArmor() && this.getBodyArmor().isDamaged()) {
             if (!world.isClient()) {
                 stack.decrement(1);
                 this.playSoundIfNotSilent(SoundEvents.ITEM_ARMOR_EQUIP_TURTLE.value());
                 ItemStack itemStack2 = this.getBodyArmor();
                 int i = (int)((float)itemStack2.getMaxDamage() * 0.125f);
                 itemStack2.setDamage(Math.max(0, itemStack2.getDamage() - i));
+                grantAdvancment(player, true);
             }
             cir.setReturnValue(ActionResult.success(world.isClient()));
+        }
+    }
+
+    @Unique
+    private static void grantAdvancment(PlayerEntity player, boolean repair) {
+        if (!(player instanceof ServerPlayerEntity serverPlayer)) {
+            return;
+        }
+        MinecraftServer server = serverPlayer.getServer();
+        if (server == null) return;
+        ServerAdvancementLoader loader = serverPlayer.getServer().getAdvancementLoader();
+        AdvancementEntry advancement;
+        if (repair) {
+            advancement = loader.get(new Identifier("husbandry/repair_wolf_armor"));
+        } else {
+            advancement = loader.get(new Identifier("husbandry/remove_wolf_armor"));
+        }
+        AdvancementProgress advancementProgress = serverPlayer.getAdvancementTracker().getProgress(advancement);
+        if (advancementProgress.isDone()) {
+            return;
+        }
+        for (String string : advancementProgress.getUnobtainedCriteria()) {
+            serverPlayer.getAdvancementTracker().grantCriterion(advancement, string);
         }
     }
 
